@@ -6,12 +6,39 @@ console.log("working");
 
 // Alternate means of instantiating the map variable
 // Create the map object with a center and zoom level.
-let map = L.map("mapid", {
-    center: [
-      34.0522, -118.2437
-    ],
-    zoom: 14
-  });
+// let map = L.map("mapid", {
+//     center: [
+//       34.0522, -118.2437
+//     ],
+//     zoom: 14
+//   })
+//   .setView([36.1733, -120.1794], 7); // center the map between an area of interest, with a zoom level of 7
+
+// Create the map object with center at the San Francisco airport.
+let map = L.map('mapid').setView([37.6213, -122.3790], 5);
+
+// Coordinates for each point connecting our line
+// let line = [
+//   [33.9416,-118.4085],
+//   [37.6213,-122.3790],
+//   [40.7899, -111.9791],
+//   [47.4502, -122.3088]  
+// ];
+
+let line = [
+  [37.6213,-122.3790],
+  [30.1975,-97.6664],
+  [43.6777,-79.6248],
+  [40.6413,-73.7781]
+];
+
+// Create a 'polyline' using line coordinates, coloring it blue and providing styling
+L.polyline(line, {
+  color: 'blue',
+  opacity: 0.5,
+  weight: 4,
+  dashArray: "10" // make the line a dashed line with spacing "10"
+}).addTo(map);
 
   // We create the tile layer that will be the background of our map.
   // the first part of the API call defines the style to be used for the map
@@ -50,7 +77,7 @@ cityData.forEach(function(city) {
 
  });
 
-let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
     // set the maximum zoom parameters
     maxZoom: 18,
