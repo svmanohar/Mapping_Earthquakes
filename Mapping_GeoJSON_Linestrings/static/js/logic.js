@@ -41,9 +41,10 @@ let sanFranAirport =
 // let map = L.map('mapid').setView([30, 30], 2);
 
 // Accessing the airport GeoJSON URL
-let airportData = "https://raw.githubusercontent.com/svmanohar/Mapping_Earthquakes/main/majorAirports.json";
+// let airportData = "https://raw.githubusercontent.com/svmanohar/Mapping_Earthquakes/main/majorAirports.json";
 
-
+// Accessing the Toronto airline routes GeoJSON URL.
+let torontoData = "https://raw.githubusercontent.com/svmanohar/Mapping_Earthquakes/main/torontoRoutes.json";
 
 // Instantiate a geoJSON object through Leafly
 // Syntax: L.geoJSON(geojsonFeature).addTo(map);
@@ -140,7 +141,7 @@ let airportData = "https://raw.githubusercontent.com/svmanohar/Mapping_Earthquak
 
 //  });
 
-let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+let light = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
     // set the maximum zoom parameters
     maxZoom: 18,
@@ -157,36 +158,37 @@ attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap
 
 // create a base layer that contains both maps
 let baseMaps = {
-  Street: streets,
+  Street: light,
   Dark: dark
 };
 
-// Create the map object with center, zoom level and default layer.
+// Create the map object with center, zoom level and default layer. Focus on Toronto
 let map = L.map('mapid', {
-  center: [30, 30],
+  center: [44, -80],
   zoom: 2,
-  layers: [streets]
+  layers: [light]
 })
 
 // Pass our map layers into our layers control and add the layers control to the map. Allows us to switch between layers
 L.control.layers(baseMaps).addTo(map);
 
-// Creating a GeoJSON layer with the retrieved data. Include airport name and FAA code
-// Use d3 to access the JSON data hosted online
-d3.json(airportData).then(function(data) {
-  L.geoJson(data, {
-    pointToLayer: function(feature, latlng) {
-      console.log(feature);
-      return L.marker(latlng)
-      .bindPopup("<h2>" + "Airport code: " + feature.properties.faa + "</h2><hr><h3>" + "Airport name: " + feature.properties.name + "</h3>")
-    }
-  }).addTo(map);
-});
+// Create a style for the lines. geoJson can take an object containing styling key-value pairs instead of directly passing in styling 
+let myStyle = {
+  color: "#ffffa1",
+  weight: 2
+}
+
 // Grabbing our GeoJSON data.
-// L.geoJson(sanFranAirport, {
-//   // We turn each feature into a marker on the map.
-//   pointToLayer: function(feature, latlng) {
-//     console.log(feature);
-//     return L.marker(latlng)
-//     .bindPopup("<h2>" + feature.properties.name + "</h2>" + "<hr><h3>" + feature.properties.city + ", " + feature.properties.country + "</h3>");
-//   }
+d3.json(torontoData).then(function(data) {
+  console.log(data);
+// Creating a GeoJSON layer with the retrieved data.
+// Apply styling and use onEachFeature() to access each line layer and bind a popup with information on each flight
+L.geoJson(data, {
+  style: myStyle,
+  onEachFeature: function(feature, layer) {
+    layer.bindPopup("<h3>Airline: " + feature.properties.airline + "</h3> <hr><h3> Destination: "
+    + feature.properties.dst + "</h3>");
+  }
+})
+.addTo(map);
+});
